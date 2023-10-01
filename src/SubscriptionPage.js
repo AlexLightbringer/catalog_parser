@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
+import './SubscriptionPage.css';
 
 const categoriesData = [
     {
@@ -66,7 +67,7 @@ const categoriesData = [
         ],
     },
     {
-        name: 'Электронные книги и аксессуары',
+        name: 'Электронные книги',
         subcategories: [
             'Электронные книги',
             'Карты памяти',
@@ -93,25 +94,29 @@ function CategorySelect(){
     return(
         <div>
             <h1>Выберите категории:</h1>
-            {
-                categoriesData.map((category) => (
-                    <div key={category.name}>
-                        <h3>{category.name}</h3>
-                        {
-                            category.subcategories.map((subcategory) => (
-                                <div key={subcategory}>
-                                    <Checkbox
-                                        checked={selectedCategories.includes(subcategory)}
-                                        onChange={() => handleCategoryChange(subcategory)}
-                                    />
-                                    {subcategory}
-                                </div>
-                            ))}
-                    </div>
-                    ))}
-                    <Button variant="contained" color="primary" onClick={handleSave}>
-                        СОХРАНИТЬ
-                    </Button>
+            <div className="category-container">
+                {
+                    categoriesData.map((category) => (
+                        <div key={category.name} className="category">
+                            <h3>{category.name}</h3>
+                            {
+                                category.subcategories.map((subcategory) => (
+                                    <div key={subcategory}>
+                                        <Checkbox
+                                            checked={selectedCategories.includes(subcategory)}
+                                            onChange={() => handleCategoryChange(subcategory)}
+                                        />
+                                        {subcategory}
+                                    </div>
+                                ))}
+                        </div>
+                        ))}
+            </div>
+                        <div className="save-container">
+                            <Button variant="contained" color="primary" onClick={handleSave}>
+                                СОХРАНИТЬ
+                            </Button>
+                        </div>
         </div>
     );
 }
