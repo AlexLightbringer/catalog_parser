@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
+import axios from 'axios';
 import './SubscriptionPage.css';
 
 const categoriesData = [
@@ -87,9 +88,21 @@ function CategorySelect(){
         }
     };
 
-    const handleSave = () => {
-        console.log('Pass')
-    }
+    const handleSave = async () => {
+        const userData = {
+          username: 'Katya',
+          email: 'katya@gmail.com',
+          selected_categories: selectedCategories,
+        };
+
+        try {
+            const response = await axios.post('http://localhost:8000/users', userData);
+            console.log('User created successfully:', response.data);
+        }
+        catch (error){
+        console.error('Error: ', error);
+        }
+    };
 
     return(
         <div>
