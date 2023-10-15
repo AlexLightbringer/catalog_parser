@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import axios from 'axios';
 import './SubscriptionPage.css';
+import { useLocation } from 'react-router-dom';
 
 const categoriesData = [
     {
@@ -76,62 +77,69 @@ const categoriesData = [
     },
 ];
 
-function CategorySelect(){
-    const [selectedCategories, setSelectedCategories] = useState([]);
+function SubscriptionPage() {
+  const location = useLocation();
+  const user = location.state ? location.state.user : null;
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const { username } = user;
 
-    const handleCategoryChange = (categoryName) => {
-        if (selectedCategories.includes(categoryName)){
-            setSelectedCategories(selectedCategories.filter((sel) => sel !== categoryName));
-        }
-        else {
-            setSelectedCategories([...selectedCategories, categoryName]);
-        }
-    };
+  useEffect(() => {
+    if (user && user.selected_categories) {
+      setSelectedCategories(user.selected_categories);
+    }
+  }, [user]);
 
-    const handleSave = async () => {
-        const userData = {
-          username: 'Katya',
-          email: 'katya@gmail.com',
-          selected_categories: selectedCategories,
-        };
+  if (!user) {
+    return <div>No user data found.</div>;
+  }
 
-        try {
-            const response = await axios.post('http://localhost:8000/users', userData);
-            console.log('User created successfully:', response.data);
-        }
-        catch (error){
+  const handleCategoryChange = (subcategory) => {
+    if (selectedCategories.includes(subcategory)) {
+      setSelectedCategories(selectedCategories.filter((sel) => sel !== subcategory));
+    } else {
+      setSelectedCategories([...selectedCategories, subcategory]);
+    }
+  };
+
+  const handleSave = async () => {
+  const updatedUser = { ...user, selected_categories: selectedCategories };
+
+      try {
+        const response = await axios.put(`http://localhost:8000/users`, updatedUser);
+        console.log('User updated successfully:', response.data);
+      }
+      catch (error) {
         console.error('Error: ', error);
-        }
-    };
+      }
+  };
 
-    return(
-        <div>
-            <h1>Выберите категории:</h1>
-            <div className="category-container">
-                {
-                    categoriesData.map((category) => (
-                        <div key={category.name} className="category">
-                            <h3>{category.name}</h3>
-                            {
-                                category.subcategories.map((subcategory) => (
-                                    <div key={subcategory}>
-                                        <Checkbox
-                                            checked={selectedCategories.includes(subcategory)}
-                                            onChange={() => handleCategoryChange(subcategory)}
-                                        />
-                                        {subcategory}
-                                    </div>
-                                ))}
-                        </div>
-                        ))}
-            </div>
-                        <div className="save-container">
-                            <Button variant="contained" color="primary" onClick={handleSave}>
-                                СОХРАНИТЬ
-                            </Button>
-                        </div>
-        </div>
-    );
+  return (
+    <div>
+      <h3>{`Здравствуйте, ${username}!`}</h3>
+      <h1>Выберите категории:</h1>
+      <div className="category-container">
+        {categoriesData.map((category) => (
+          <div key={category.name} className="category">
+            <h3>{category.name}</h3>
+            {category.subcategories.map((subcategory) => (
+              <div key={subcategory}>
+                <Checkbox
+                  checked={selectedCategories.includes(subcategory)}
+                  onChange={() => handleCategoryChange(subcategory)}
+                />
+                {subcategory}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="save-container">
+        <Button variant="contained" color="primary" onClick={handleSave}>
+          СОХРАНИТЬ
+        </Button>
+      </div>
+    </div>
+  );
 }
 
-export default CategorySelect;
+export default SubscriptionPage;
